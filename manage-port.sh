@@ -48,13 +48,13 @@ fi
 set -o xtrace 
 
 # iptables PREROUTING rule
-iptables -t nat -$rule PREROUTING -i $WG_INTERFACE -p $protocol --dport $port -j DNAT --to-destination $CLIENT_IP:$port
+iptables -t nat -$rule PREROUTING -i $PHYSICAL_INTERFACE -p $protocol --dport $port -j DNAT --to-destination $CLIENT_IP:$port
 
 # Route packets client -> server
-iptables -$rule FORWARD -i $WG_INTERFACE -o $CLIENT_INTERFACE -p $protocol --sport $port -s $CLIENT_IP -j ACCEPT
+iptables -$rule FORWARD -i $WG_INTERFACE -o $PHYSICAL_INTERFACE -p $protocol --sport $port -s $CLIENT_IP -j ACCEPT
 
 # Route packets server -> client
-iptables -$rule FORWARD -i $CLIENT_INTERFACE -o $WG_INTERFACE -p $protocol --dport $port -d $CLIENT_IP -j ACCEPT
+iptables -$rule FORWARD -i $PHYSICAL_INTERFACE -o $WG_INTERFACE -p $protocol --dport $port -d $CLIENT_IP -j ACCEPT
 
 # Stop printing commands	
 set +o xtrace
