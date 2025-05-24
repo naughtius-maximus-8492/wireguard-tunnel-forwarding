@@ -60,5 +60,5 @@ iptables -$rule FORWARD -i $PHYSICAL_INTERFACE -o $WG_INTERFACE -p $protocol --d
 set +o xtrace
 
 if [ $save == true ] ; then
-	iptables-save
+	iptables-save > /etc/iptables/rules.v4
 fi
