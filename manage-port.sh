@@ -11,6 +11,7 @@ function print_help {
 	echo ""
 	echo "-- iptables management --"
 	echo "-t        ; Makes the iptables rule temporary. Reboots will flush it"
+	echo "-s	; List open ports"
 	exit
 } 	
 
