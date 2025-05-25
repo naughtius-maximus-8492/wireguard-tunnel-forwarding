@@ -14,7 +14,7 @@ function server_setup {
 	iptables-save > /etc/iptables/rules.v4
 
 	# Use server configs
-#	cp wg-configs/wg-server.conf /etc/wireguard/wg0.conf
+	cp wg-configs/wg-server.conf /etc/wireguard/wg0.conf
 
 	# Enable service to start now and at boot
 	systemctl --enable now wg-quick@wg0
@@ -24,7 +24,7 @@ function server_setup {
 
 function peer_setup {
 	# Use client configs
-#	cp wg-configs/wg-peer.conf /etc/wireguard/wg0.conf
+	cp wg-configs/wg-peer.conf /etc/wireguard/wg0.conf
 
 	# Enable service to start now and at boot
 	systemctl --enable now wg-quick@wg0
