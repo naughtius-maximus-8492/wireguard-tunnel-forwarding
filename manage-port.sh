@@ -1,8 +1,7 @@
-
 source .env
 
 function print_help {
-	echo "### Help Menu ###"
+	echo "Help Menu:"
 	echo "-h        ; Show this menu"
 	echo ""
 	echo "-- Port management --"
