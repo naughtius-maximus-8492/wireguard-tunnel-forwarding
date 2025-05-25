@@ -18,8 +18,10 @@ function print_help {
 function show_ports {
 	echo "Open ports:"
 	iptables -S | grep dport | awk '{print $12,$14}'
+	exit
 }
 
+# Default to showing help when no args present
 if [ "$#" -lt 1 ]; then
 	print_help
 fi
@@ -43,6 +45,7 @@ do
 	c) rule=D;;
 	t) save=false;;
 	u) protocol=udp;;
+	*) exit;;
     esac
 done
 
