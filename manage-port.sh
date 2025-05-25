@@ -10,6 +10,11 @@ function print_help {
 	exit
 } 	
 
+function show_ports {
+	echo "Open ports:"
+	iptables -S | grep dport | awk '{print $12,$14}'
+}
+
 help=false
 
 # A : Adds rule
@@ -22,10 +27,11 @@ protocol=tcp
 # When true, runs iptables-save at the end to persist on reboot
 save=true
 
-while getopts hp:ctu flag
+while getopts hsp:ctu flag
 do
     case "${flag}" in
-	h) help=true;;
+	h) print_help;;
+	s) show_ports;;
         p) port=${OPTARG};;
 	c) rule=D;;
 	t) save=false;;
@@ -38,10 +44,6 @@ if (( !($port >= 1 && $port <= 65535) )) ; then
 	echo "> port = $port"
 	echo "Use -h for help"
 	exit
-fi
-
-if [ $help == true ] ; then
-	print_help
 fi
 
 # Print commands	
