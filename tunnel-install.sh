@@ -1,12 +1,6 @@
 source .env
 
-apt update
-apt install wireguard
-
 function server_setup {
-	# Install iptables for routing and iptables-persistent to save them even after a reboot
-	apt install iptables iptables-persistent
-
 	# Allow peer to access internet
 	iptables -t nat -A POSTROUTING -o $PHYSICAL_INTERFACE -j MASQUERADE
 
