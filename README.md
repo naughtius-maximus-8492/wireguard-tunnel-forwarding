@@ -1,11 +1,12 @@
 # wireguard-tunnel-forwarding
 **Do not run these scripts without following the configuration steps below or it will not work**
 ## Requirements
-### Server & Peer
+### Server & Peer Hosts
 - wireguard
-### Server Only
+### Server Host Only
 - iptables
 - iptables-persistent
+- Port 51820 opened on your firewalls (both external and internal)
 
 If you're using apt, you can simply install using these commands:
 ```
