@@ -7,6 +7,10 @@ function server_setup {
 	# Save rules for reboot
 	iptables-save > /etc/iptables/rules.v4
 
+	# Enable ipv4 forwarding
+	echo 1 > /proc/sys/net/ipv4/ip_forward
+	sysctl -p
+
 	# Use server configs
 	cp wg-configs/wg-server.conf /etc/wireguard/wg0.conf
 
