@@ -89,10 +89,11 @@ PersistentKeepalive = 25
 ```
 
 ## Physical Interface
+> NOTE: This only needs to be done on the wireguard server host as it only affects iptables commands.
 The `.env` file has the `PHYSICAL_INTERFACE` set to `eth0` by default. This may not be the same on all servers. You can find this out by running the command `ip addr` which will give an output that looks like this:
 
 ```
-root@proxy-test:~# ip addr
+root@wireguard-server-host:~# ip addr
 1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
     inet 127.0.0.1/8 scope host lo
@@ -108,7 +109,7 @@ root@proxy-test:~# ip addr
        valid_lft forever preferred_lft forever
 ```
 
-We can see here that my physical interface is actually `ens18` so I should change `eth0` to `ens18`.
+We can see here that my physical interface is actually `ens18` so you should change `eth0` to `ens18`.
 
 # Running the Scripts
 Once these are all set, run `./tunnel-install.sh -s` on the server and `./tunnel-install.sh -p` on the peer server. 
