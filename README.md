@@ -45,9 +45,9 @@ Fh22Wyq60USJ87cKG37sqwdNe5k0YLSMlDiKDpJdKGU= # Peer Public Key
 These config examples use the outputs from the above command samples to fill in the fields. Do not use these keys and IP as you need to generate your own.
 
 ```
-##################
-# wg-server.conf #
-##################
+#############################
+# wg-configs/wg-server.conf #
+#############################
 
 [Interface]
 Address = 10.0.0.1/24
@@ -59,9 +59,9 @@ PublicKey = Fh22Wyq60USJ87cKG37sqwdNe5k0YLSMlDiKDpJdKGU=
 AllowedIPs = 10.0.0.2/32
 PersistentKeepalive = 25
 
-################
-# wg-peer.conf #
-################
+###########################
+# wg-configs/wg-peer.conf #
+###########################
 
 [Interface]
 Address = 10.0.0.2/24
@@ -73,3 +73,28 @@ Endpoint = 192.123.4.56:51820
 AllowedIPs = 0.0.0.0/0
 PersistentKeepalive = 25
 ```
+
+## Physical Interface
+The `.env` file has the `PHYSICAL_INTERFACE` set to `eth0` by default. This may not be the same on all servers. You can find this out by running the command `ip addr` which will give an output that looks like this:
+
+```
+root@proxy-test:~# ip addr
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host noprefixroute
+       valid_lft forever preferred_lft forever
+2: ens18: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
+    link/ether bc:24:11:1e:b3:07 brd ff:ff:ff:ff:ff:ff
+    altname enp0s18
+    inet 192.168.1.2/24 brd 192.168.1.255 scope global dynamic ens18
+       valid_lft 84404sec preferred_lft 84404sec
+    inet6 fe80::be24:11ff:fe1e:b307/64 scope link
+       valid_lft forever preferred_lft forever
+```
+
+We can see here that my physical interface is actually `ens18` so I should change `eth0` to `ens18`.
+
+# Running the Scripts
+Once these are all set, run `./tunnel-install.sh -s` on the server and `./tunnel-install.sh -p` on the peer server. You can then see the option for opening ports using `./manage-port.sh -h`.
