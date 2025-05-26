@@ -1,11 +1,18 @@
 # wireguard-tunnel-forwarding
 
 ## Installing Requirements
-### Server & Client
+### Server & Peer
 - wireguard
 ### Server Only
 - iptables
 - iptables-persistent
+
+If you're using apt, you can simply install using these commands:
+```
+apt install wireguard # Wireguard Peer
+
+apt install wireguard iptables iptables-persistent # Wireguard Server
+```
 
 ## Generating Public/Private keys
 On both the client and server, run this command in a dedicated area for your keys. For example:
