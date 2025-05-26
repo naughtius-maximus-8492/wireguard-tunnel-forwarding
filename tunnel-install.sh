@@ -11,7 +11,7 @@ function server_setup {
 	cp wg-configs/wg-server.conf /etc/wireguard/wg0.conf
 
 	# Enable service to start now and at boot
-	systemctl --enable now wg-quick@wg0
+	systemctl enable --now wg-quick@wg0
 
 	exit
 }
@@ -21,7 +21,7 @@ function peer_setup {
 	cp wg-configs/wg-peer.conf /etc/wireguard/wg0.conf
 
 	# Enable service to start now and at boot
-	systemctl --enable now wg-quick@wg0
+	systemctl enable --now wg-quick@wg0
 
 	exit
 }	
