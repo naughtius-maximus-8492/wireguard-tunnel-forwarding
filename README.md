@@ -16,8 +16,9 @@ apt install wireguard iptables iptables-persistent # Wireguard Server
 
 **It is also recommended to run these commands as root on the peer and server as this touches many places where root can only access**
 
-## Generating Public/Private keys
-On both the client and server, run this command in a dedicated area for your keys. For example:
+## Setting up peer and server configs
+### Wireguard Key Pairs
+On both the peer and server, run this command in a dedicated area for your keys. For example:
 ```
 # Use your user home dir
 cd ~
@@ -31,21 +32,24 @@ wg genkey | tee privatekey | wg pubkey > publickey
 cat privatekey publickey
 ```
 
-Once these are generated the server and peer, add the keys to the files in `wg-configs/` as the tunnel install script copies these in. You will need to edit the `PrivateKey` & `PublicKey` fields in both `wg-server.conf` and `wg-peer.conf` with the keys we generated above. You will also need to add the public IP address of the wireguard server to `Endpoint` in `wg-peer.conf`
+Once these are generated the server and peer, add the keys to the files in `wg-configs/` as the tunnel install script copies these in. You will need to edit the `PrivateKey` & `PublicKey` fields in both `wg-server.conf` and `wg-peer.conf` with the keys we generated above. 
+
+### Endpoint/Public IP
+In your peer config, you need to supply the public IP of the wireguard server host. This can be obtained using `curl ifconfig.io` or in your panel if you're using a managed VPS hosting service.
 
 ### Command Examples
 ```
 # Wireguard Server
-root@server-test:~# wg genkey | tee privatekey | wg pubkey > publickey
-root@server-test:~# cat privatekey publickey
+root@wireguard-server-host:~# wg genkey | tee privatekey | wg pubkey > publickey
+root@wireguard-server-host:~# cat privatekey publickey
 2BBeRRCv58BejMPUdvzbPaMrdr9ept+Dg4+Z+WAIZmI= # Server Private Key
 4XESbxb9z4voktNn4Kmlow3+rYvTDgaqFDrOEQCxfzk= # Server Public Key
-root@server-test:~# curl ifconfig.io
+root@wireguard-server-host:~# curl ifconfig.io
 192.123.4.56                                 # Server Public IP
 
 # Wireguard Peer
-root@peer-test:~# wg genkey | tee privatekey | wg pubkey > publickey
-root@peer-test:~# cat privatekey publickey
+root@wireguard-peer-host:~# wg genkey | tee privatekey | wg pubkey > publickey
+root@wireguard-peer-host:~# cat privatekey publickey
 CLjWcDLrQWF4MWAbcnA1FCxMyyxIfTYgETZX2T0svUs= # Peer Private Key
 Fh22Wyq60USJ87cKG37sqwdNe5k0YLSMlDiKDpJdKGU= # Peer Public Key
 ```
@@ -54,9 +58,9 @@ Fh22Wyq60USJ87cKG37sqwdNe5k0YLSMlDiKDpJdKGU= # Peer Public Key
 These config examples use the outputs from the above command samples to fill in the fields. Do not use these keys and IP as you need to generate your own.
 
 ```
-#############################
-# wg-configs/wg-server.conf #
-#############################
+#####################################################
+# <WIREGUARD_SERVER_HOST>/wg-configs/wg-server.conf #
+#####################################################
 
 [Interface]
 Address = 10.0.0.1/24
@@ -68,9 +72,9 @@ PublicKey = Fh22Wyq60USJ87cKG37sqwdNe5k0YLSMlDiKDpJdKGU=
 AllowedIPs = 10.0.0.2/32
 PersistentKeepalive = 25
 
-###########################
-# wg-configs/wg-peer.conf #
-###########################
+#################################################
+# <WIREGUARD_PEER_HOST>/wg-configs/wg-peer.conf #
+#################################################
 
 [Interface]
 Address = 10.0.0.2/24
@@ -106,4 +110,14 @@ root@proxy-test:~# ip addr
 We can see here that my physical interface is actually `ens18` so I should change `eth0` to `ens18`.
 
 # Running the Scripts
-Once these are all set, run `./tunnel-install.sh -s` on the server and `./tunnel-install.sh -p` on the peer server. You can then see the option for opening ports using `./manage-port.sh -h`.
+Once these are all set, run `./tunnel-install.sh -s` on the server and `./tunnel-install.sh -p` on the peer server. 
+
+To open ports, run `./manage-port.sh -h` on the **wireguard server host** to see your options. As an example, this is what opening TCP port 42420 looks like:
+
+```
+root@wireguard-server-host:~/wireguard-tunnel-forwarding-master# ./manage-port.sh -p 42420
+++ iptables -t nat -A PREROUTING -i ens18 -p tcp --dport 42420 -j DNAT --to-destination 10.0.0.2:42420
+++ iptables -A FORWARD -i wg0 -o ens18 -p tcp --sport 42420 -s 10.0.0.2 -j ACCEPT
+++ iptables -A FORWARD -i ens18 -o wg0 -p tcp --dport 42420 -d 10.0.0.2 -j ACCEPT
+++ set +o xtrace
+```

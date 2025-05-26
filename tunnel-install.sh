@@ -1,6 +1,8 @@
 source .env
 
 function server_setup {
+	echo "Installing wireguard with the server config..."
+
 	# Allow peer to access internet
 	iptables -t nat -A POSTROUTING -o $PHYSICAL_INTERFACE -j MASQUERADE
 
@@ -16,16 +18,20 @@ function server_setup {
 
 	# Enable service to start now and at boot
 	systemctl enable --now wg-quick@wg0
+	systemctl status wg-quick@wg0
 
 	exit
 }
 
 function peer_setup {
+	echo "Installing wireguard with the peer config..."
+
 	# Use client configs
 	cp wg-configs/wg-peer.conf /etc/wireguard/wg0.conf
 
 	# Enable service to start now and at boot
 	systemctl enable --now wg-quick@wg0
+	systemctl status wg-quick@wg0
 
 	exit
 }	
