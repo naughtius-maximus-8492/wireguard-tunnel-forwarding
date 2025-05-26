@@ -49,6 +49,7 @@ do
     esac
 done
 
+# Exit if port not in usable range
 if (( !($port >= 1 && $port <= 65535) )) ; then
 	echo "Port not in valid range (1 - 65535)"
 	echo "> port = $port"
@@ -63,10 +64,10 @@ set -o xtrace
 iptables -t nat -$rule PREROUTING -i $PHYSICAL_INTERFACE -p $protocol --dport $port -j DNAT --to-destination 10.0.0.2:$port
 
 # Route packets client -> server
-iptables -$rule FORWARD -i $WG_INTERFACE -o $PHYSICAL_INTERFACE -p $protocol --sport $port -s 10.0.0.2 -j ACCEPT
+iptables -$rule FORWARD -i wg0 -o $PHYSICAL_INTERFACE -p $protocol --sport $port -s 10.0.0.2 -j ACCEPT
 
 # Route packets server -> client
-iptables -$rule FORWARD -i $PHYSICAL_INTERFACE -o $WG_INTERFACE -p $protocol --dport $port -d 10.0.0.2 -j ACCEPT
+iptables -$rule FORWARD -i $PHYSICAL_INTERFACE -o wg0 -p $protocol --dport $port -d 10.0.0.2 -j ACCEPT
 
 # Stop printing commands	
 set +o xtrace
