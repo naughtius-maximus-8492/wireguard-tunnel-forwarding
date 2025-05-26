@@ -90,6 +90,7 @@ PersistentKeepalive = 25
 
 ## Physical Interface
 > NOTE: This only needs to be done on the wireguard server host as it only affects iptables commands.
+
 The `.env` file has the `PHYSICAL_INTERFACE` set to `eth0` by default. This may not be the same on all servers. You can find this out by running the command `ip addr` which will give an output that looks like this:
 
 ```
