@@ -1,6 +1,6 @@
 # wireguard-tunnel-forwarding
-
-## Installing Requirements
+**Do not run these scripts without following the configuration steps below or it will not work**
+## Requirements
 ### Server & Peer
 - wireguard
 ### Server Only
@@ -13,6 +13,8 @@ apt install wireguard # Wireguard Peer
 
 apt install wireguard iptables iptables-persistent # Wireguard Server
 ```
+
+**It is also recommended to run these commands as root on the peer and server as this touches many places where root can only access**
 
 ## Generating Public/Private keys
 On both the client and server, run this command in a dedicated area for your keys. For example:
