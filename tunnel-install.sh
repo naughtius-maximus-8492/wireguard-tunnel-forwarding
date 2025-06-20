@@ -13,9 +13,17 @@ function server_setup {
 	echo 1 > /proc/sys/net/ipv4/ip_forward
 	sysctl -p
 
-	# Use server configs
-	cp wg-configs/wg-server.conf /etc/wireguard/wg0.conf
+	# Create server config
+	echo "[Interface]
+	Address = 10.0.0.1/24
+	ListenPort = 51820
+	PrivateKey = $SERVER_PRIVATE_KEY
 
+	[Peer]
+	PublicKey = $PEER_PUBLIC_KEY
+	AllowedIPs = 10.0.0.2/32
+	PersistentKeepalive = 25" > output.txt
+	
 	# Enable service to start now and at boot
 	systemctl enable --now wg-quick@wg0
 	systemctl status wg-quick@wg0
