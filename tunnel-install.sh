@@ -13,6 +13,13 @@ function server_setup {
 	echo 1 > /proc/sys/net/ipv4/ip_forward
 	sysctl -p
 
+	# Generate server and peer keys
+	SERVER_PRIVATE_KEY=$(wg genkey)
+	SERVER_PUBLIC_KEY=$(echo $SERVER_PRIVATE_KEY | wg pubkey)
+
+	PEER_PRIVATE_KEY=$(wg genkey)
+	PEER_PUBLIC_KEY=$(echo $PEER_PRIVATE_KEY | wg pubkey)
+
 	# Create server config
 	echo "[Interface]
 	Address = 10.0.0.1/24
