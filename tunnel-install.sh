@@ -28,13 +28,13 @@ PrivateKey = $SERVER_PRIVATE_KEY
 [Peer]
 PublicKey = $PEER_PUBLIC_KEY
 AllowedIPs = 10.0.0.2/32
-PersistentKeepalive = 25" > /etc/wireguard/$WG_INTERFACE.conf
+PersistentKeepalive = 25" > /etc/wireguard/$SERVER_WG_INTERFACE.conf
 
 # Build command to paste onto client
 echo "
-#################################################
-# PASTE THE BELOW COMMAND INTO YOUR CLIENT HOST #
-#################################################
+###############################################
+# PASTE THE BELOW COMMAND INTO YOUR PEER HOST #
+###############################################
 
 echo \"[Interface]
 Address = 10.0.0.2/24
@@ -44,4 +44,4 @@ PrivateKey = $PEER_PRIVATE_KEY
 PublicKey = $SERVER_PUBLIC_KEY
 Endpoint = $SERVER_PUBLIC_IP:$WG_PORT
 AllowedIPs = 0.0.0.0/0
-PersistentKeepalive = 25\" > /etc/wireguard/$WG_INTERFACE.conf"
+PersistentKeepalive = 25\" > /etc/wireguard/$PEER_WG_INTERFACE.conf"

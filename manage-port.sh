@@ -64,10 +64,10 @@ set -o xtrace
 iptables -t nat -$rule PREROUTING -i $PHYSICAL_INTERFACE -p $protocol --dport $port -j DNAT --to-destination $WG_SUBNET:$port
 
 # Route packets client -> server
-iptables -$rule FORWARD -i $WG_INTERFACE -o $PHYSICAL_INTERFACE -p $protocol --sport $port -s $WG_SUBNET -j ACCEPT
+iptables -$rule FORWARD -i $SERVER_WG_INTERFACE -o $PHYSICAL_INTERFACE -p $protocol --sport $port -s $WG_SUBNET -j ACCEPT
 
 # Route packets server -> client
-iptables -$rule FORWARD -i $PHYSICAL_INTERFACE -o $WG_INTERFACE -p $protocol --dport $port -d $WG_SUBNET -j ACCEPT
+iptables -$rule FORWARD -i $PHYSICAL_INTERFACE -o $SERVER_WG_INTERFACE -p $protocol --dport $port -d $WG_SUBNET -j ACCEPT
 
 # Stop printing commands	
 set +o xtrace
