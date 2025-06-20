@@ -30,10 +30,6 @@ PublicKey = $PEER_PUBLIC_KEY
 AllowedIPs = 10.0.0.2/32
 PersistentKeepalive = 25" > output.txt
 
-# Enable service to start now and at boot
-systemctl enable --now wg-quick@wg0
-systemctl status wg-quick@wg0
-
 # Build command to paste onto client
 echo "
 #################################################
