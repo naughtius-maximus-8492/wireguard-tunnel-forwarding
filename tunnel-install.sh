@@ -28,7 +28,7 @@ PrivateKey = $SERVER_PRIVATE_KEY
 [Peer]
 PublicKey = $PEER_PUBLIC_KEY
 AllowedIPs = 10.0.0.2/32
-PersistentKeepalive = 25" > output.txt
+PersistentKeepalive = 25" > /etc/wireguard/wg0.conf
 
 # Build command to paste onto client
 echo "
