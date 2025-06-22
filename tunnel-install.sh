@@ -49,23 +49,23 @@ function echo_client_config {
 	# Build command to paste onto client
 	echo "Wireguard server config built!
 
-	###############################################
-	# PASTE THE COMMAND BELOW INTO YOUR PEER HOST #
-	###############################################
+###############################################
+# PASTE THE COMMAND BELOW INTO YOUR PEER HOST #
+###############################################
 
-	echo \"[Interface]
-	Address = $PEER_WG_SUBNET/24
-	PrivateKey = $PEER_PRIVATE_KEY
+echo \"[Interface]
+Address = $PEER_WG_SUBNET/24
+PrivateKey = $PEER_PRIVATE_KEY
 
-	[Peer]
-	PublicKey = $SERVER_PUBLIC_KEY
-	Endpoint = $SERVER_PUBLIC_IP:$WG_PORT
-	AllowedIPs = 0.0.0.0/0
-	PersistentKeepalive = 25\" > /etc/wireguard/$PEER_WG_INTERFACE.conf
+[Peer]
+PublicKey = $SERVER_PUBLIC_KEY
+Endpoint = $SERVER_PUBLIC_IP:$WG_PORT
+AllowedIPs = 0.0.0.0/0
+PersistentKeepalive = 25\" > /etc/wireguard/$PEER_WG_INTERFACE.conf
 
-	###############################################
-	#                     END                     #
-	###############################################"
+###############################################
+#                     END                     #
+###############################################"
 }
 
 echo_client_config
