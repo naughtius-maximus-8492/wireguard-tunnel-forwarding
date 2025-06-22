@@ -45,10 +45,11 @@ PublicKey = $PEER_PUBLIC_KEY
 AllowedIPs = $PEER_WG_SUBNET/32
 PersistentKeepalive = 25" > /etc/wireguard/$SERVER_WG_INTERFACE.conf
 
+echo "Wireguard server config built!"
+
 function echo_client_config {
 	# Build command to paste onto client
-	echo "Wireguard server config built!
-
+	echo "
 ###############################################
 # PASTE THE COMMAND BELOW INTO YOUR PEER HOST #
 ###############################################
