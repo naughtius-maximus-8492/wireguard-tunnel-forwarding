@@ -25,10 +25,10 @@ apt install wireguard iptables iptables-persistent
 
 **You should run these next commands as root on the peer and server host as this touches places where root can only access**
 
-# Setting up your environment file
+## Setting up your environment file
 Both scripts source the `.env` file present in the repository. For most people, they will only need to get 
 
-## PHYSICAL_INTERFACE
+### PHYSICAL_INTERFACE
 The `.env` file has the `PHYSICAL_INTERFACE` set to nothing by default. You can find the correct value by running the command `ip addr`:
 
 ```
@@ -50,7 +50,7 @@ root@wireguard-server-host:~# ip addr
 
 Here, my physical interface is actually `ens18` so you should change the `PHYSICAL_INTERFACE` variable in `.env` to `ens18`.
 
-## SERVER_PUBLIC_IP
+### SERVER_PUBLIC_IP
 The `.env` file has the `SERVER_PUBLIC_IP` set to nothing by default. This should just be the public IP of the server host. You can find this in many different ways, one way is to run the command `curl ifconfig.io`:
 
 ```
@@ -60,7 +60,7 @@ root@pelican-panel-proxy:~/wireguard-tunnel-forwarding-master# curl ifconfig.io
 
 From this example, we see the public IP of the server is `185.87.65.43`. Alternatively, if you've bought a VPS, this can easily be found on their control panels or set-up email.
 
-# Running the Scripts
+## Running the Scripts
 Once these are all set, run `./tunnel-install.sh` on the **wireguard server host**. Provided `.env` is set up correctly, your configs are automatically populated on the server. You will also get a multiline command that should be pasted into the peer host to set up the necessary configs for connection to the wireguard server.
 
 To open ports, run `./manage-port.sh -h` on the **wireguard server host** to see your options. As an example, this is what opening TCP & UDP port 42420 looks like:
