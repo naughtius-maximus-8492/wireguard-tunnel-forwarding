@@ -3,6 +3,7 @@ These scripts allow you to quickly set up a full Wireguard tunnel between a peer
 - Your ISP puts you behind CGNAT making you unable to port forward.
 - You don't want to expose your services from your home's public IP but are happy to do it through a server on different IP (e.g. cheap VPS).
 - You want to use another server's DDOS protection without running your services on that specific machine.
+
 These scripts should simplify the setup and management of this.
 
 ## Requirements
