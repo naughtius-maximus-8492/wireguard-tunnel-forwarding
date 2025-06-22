@@ -31,8 +31,6 @@ apt install wireguard
 apt install wireguard iptables iptables-persistent
 ```
 
-**You should run these next commands as root on the peer and server host as this touches places where root can only access**
-
 ## Installation
 Simply clone the repository or download the latest release. If downloading the latest release, you'll need to unzip it before using it.
 
