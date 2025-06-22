@@ -1,5 +1,10 @@
 # wireguard-tunnel-forwarding
-**Do not run these scripts without following the configuration steps below or it will not work**
+These scripts allow you to quickly set up a full Wireguard tunnel between a peer and server host and open ports between the two. This allows you to run your services on the peer host and then expose it via the server hosts network. You may want to do this for a few reasons:
+- Your ISP puts you behind CGNAT making you unable to port forward.
+- You don't want to expose your services from your home's public IP but are happy to do it through a server on different IP (e.g. cheap VPS).
+- You want to use another server's DDOS protection without running your services on that specific machine.
+These scripts should simplify the setup and management of this.
+
 ## Requirements
 ### Server & Peer Hosts
 - wireguard
@@ -10,88 +15,20 @@
 
 If you're using apt, you can simply install using these commands:
 ```
-apt install wireguard # Wireguard Peer
+# Wireguard peer host
+apt install wireguard
 
-apt install wireguard iptables iptables-persistent # Wireguard Server
+# Wireguard server host
+apt install wireguard iptables iptables-persistent
 ```
 
-**It is also recommended to run these commands as root on the peer and server as this touches many places where root can only access**
+**You should run these next commands as root on the peer and server host as this touches places where root can only access**
 
-## Setting up peer and server configs
-### Wireguard Key Pairs
-On both the peer and server, run this command in a dedicated area for your keys. For example:
-```
-# Use your user home dir
-cd ~
+# Setting up your environment file
+Both scripts source the `.env` file present in the repository. For most people, they will only need to get 
 
-# Create dedicate dir in your home for keys
-mkdir wg-keys
-cd wg-keys
-
-# Generate and display key pair 
-wg genkey | tee privatekey | wg pubkey > publickey
-cat privatekey publickey
-```
-
-Once these are generated the server and peer, add the keys to the files in `wg-configs/` as the tunnel install script copies these in. You will need to edit the `PrivateKey` & `PublicKey` fields in both `wg-server.conf` and `wg-peer.conf` with the keys we generated above. 
-
-### Endpoint/Public IP
-In your peer config, you need to supply the public IP of the wireguard server host. This can be obtained using `curl ifconfig.io` or in your panel if you're using a managed VPS hosting service.
-
-### Command Examples
-```
-# Wireguard Server
-root@wireguard-server-host:~# wg genkey | tee privatekey | wg pubkey > publickey
-root@wireguard-server-host:~# cat privatekey publickey
-2BBeRRCv58BejMPUdvzbPaMrdr9ept+Dg4+Z+WAIZmI= # Server Private Key
-4XESbxb9z4voktNn4Kmlow3+rYvTDgaqFDrOEQCxfzk= # Server Public Key
-root@wireguard-server-host:~# curl ifconfig.io
-192.123.4.56                                 # Server Public IP
-
-# Wireguard Peer
-root@wireguard-peer-host:~# wg genkey | tee privatekey | wg pubkey > publickey
-root@wireguard-peer-host:~# cat privatekey publickey
-CLjWcDLrQWF4MWAbcnA1FCxMyyxIfTYgETZX2T0svUs= # Peer Private Key
-Fh22Wyq60USJ87cKG37sqwdNe5k0YLSMlDiKDpJdKGU= # Peer Public Key
-```
-
-### Config Examples
-These config examples use the outputs from the above command samples to fill in the fields. Do not use these keys and IP as you need to generate your own.
-
-```
-#####################################################
-# <WIREGUARD_SERVER_HOST>/wg-configs/wg-server.conf #
-#####################################################
-
-[Interface]
-Address = 10.0.0.1/24
-ListenPort = 51820
-PrivateKey = 2BBeRRCv58BejMPUdvzbPaMrdr9ept+Dg4+Z+WAIZmI=
-
-[Peer]
-PublicKey = Fh22Wyq60USJ87cKG37sqwdNe5k0YLSMlDiKDpJdKGU=
-AllowedIPs = 10.0.0.2/32
-PersistentKeepalive = 25
-
-#################################################
-# <WIREGUARD_PEER_HOST>/wg-configs/wg-peer.conf #
-#################################################
-
-[Interface]
-Address = 10.0.0.2/24
-PrivateKey = CLjWcDLrQWF4MWAbcnA1FCxMyyxIfTYgETZX2T0svUs=
-
-[Peer]
-PublicKey = 4XESbxb9z4voktNn4Kmlow3+rYvTDgaqFDrOEQCxfzk=
-Endpoint = 192.123.4.56:51820
-AllowedIPs = 0.0.0.0/0
-PersistentKeepalive = 25
-```
-
-## Physical Interface
-> NOTE: This only needs to be done on the wireguard server host as it only affects iptables commands.
-
-The `.env` file has the `PHYSICAL_INTERFACE` set to `eth0` by default. This may not be the same on all servers. You can find this out by running the command `ip addr` which will give an output that looks like this:
+## PHYSICAL_INTERFACE
+The `.env` file has the `PHYSICAL_INTERFACE` set to nothing by default. You can find the correct value by running the command `ip addr`:
 
 ```
 root@wireguard-server-host:~# ip addr
@@ -110,17 +47,32 @@ root@wireguard-server-host:~# ip addr
        valid_lft forever preferred_lft forever
 ```
 
-We can see here that my physical interface is actually `ens18` so you should change `eth0` to `ens18`.
+Here, my physical interface is actually `ens18` so you should change the `PHYSICAL_INTERFACE` variable in `.env` to `ens18`.
+
+## SERVER_PUBLIC_IP
+The `.env` file has the `SERVER_PUBLIC_IP` set to nothing by default. This should just be the public IP of the server host. You can find this in many different ways, one way is to run the command `curl ifconfig.io`:
+
+```
+root@pelican-panel-proxy:~/wireguard-tunnel-forwarding-master# curl ifconfig.io
+185.87.65.43
+```
+
+From this example, we see the public IP of the server is `185.87.65.43`. Alternatively, if you've bought a VPS, this can easily be found on their control panels or set-up email.
 
 # Running the Scripts
-Once these are all set, run `./tunnel-install.sh -s` on the server and `./tunnel-install.sh -p` on the peer server. 
+Once these are all set, run `./tunnel-install.sh` on the **wireguard server host**. Provided `.env` is set up correctly, your configs are automatically populated on the server. You will also get a multiline command that should be pasted into the peer host to set up the necessary configs for connection to the wireguard server.
 
-To open ports, run `./manage-port.sh -h` on the **wireguard server host** to see your options. As an example, this is what opening TCP port 42420 looks like:
+To open ports, run `./manage-port.sh -h` on the **wireguard server host** to see your options. As an example, this is what opening TCP & UDP port 42420 looks like:
 
 ```
 root@wireguard-server-host:~/wireguard-tunnel-forwarding-master# ./manage-port.sh -p 42420
 ++ iptables -t nat -A PREROUTING -i ens18 -p tcp --dport 42420 -j DNAT --to-destination 10.0.0.2:42420
 ++ iptables -A FORWARD -i wg0 -o ens18 -p tcp --sport 42420 -s 10.0.0.2 -j ACCEPT
 ++ iptables -A FORWARD -i ens18 -o wg0 -p tcp --dport 42420 -d 10.0.0.2 -j ACCEPT
+++ set +o xtrace
+root@wireguard-server-host:~/wireguard-tunnel-forwarding-master# ./manage-port.sh -up 42420
+++ iptables -t nat -A PREROUTING -i ens18 -p udp --dport 42420 -j DNAT --to-destination 10.0.0.2:42420
+++ iptables -A FORWARD -i wg0 -o ens18 -p udp --sport 42420 -s 10.0.0.2 -j ACCEPT
+++ iptables -A FORWARD -i ens18 -o wg0 -p udp --dport 42420 -d 10.0.0.2 -j ACCEPT
 ++ set +o xtrace
 ```

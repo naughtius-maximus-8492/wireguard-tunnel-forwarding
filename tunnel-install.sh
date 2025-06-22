@@ -1,13 +1,13 @@
 source .env
 
 # Validate .env
-if [[ -z $SERVER_PUBLIC_IP ]] ; then
-	echo "Assign SERVER_PUBLIC_IP a value in .env before continuing."
+if [[ -z $PHYSICAL_INTERFACE ]] ; then
+	echo "Assign PHYSICAL_INTERFACE a value in .env before continuing."
 	exit
 fi
 
-if [[ -z $PHYSICAL_INTERFACE ]] ; then
-	echo "Assign PHYSICAL_INTERFACE a value in .env before continuing."
+if [[ -z $SERVER_PUBLIC_IP ]] ; then
+	echo "Assign SERVER_PUBLIC_IP a value in .env before continuing."
 	exit
 fi
 
