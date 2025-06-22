@@ -71,7 +71,7 @@ From this example, we see the public IP of the server is `185.87.65.43`. Alterna
 
 ## Running the Scripts
 ### Tunnel Install
-Once these are all set, run `./tunnel-install.sh` on the **wireguard server host**. Provided `.env` is set up correctly, your configs are automatically populated on the server. You will also get a multiline command that should be pasted into the peer host to set up the necessary configs for connection to the wireguard server.
+Once these are all set, run `./tunnel-install.sh` on the **wireguard server host**. Provided `.env` is set up correctly, your configs are automatically populated in `/etc/wireguard/wg0.conf`. You will also get a multiline command that should be pasted into the peer host to set up the necessary configs for connection to the wireguard server. Note that this is saved under `current-client-config.txt` and will be automatically updated each time you run `tunnel-install.sh`
 
 
 If this runs succesfully, it should look similar to this:
@@ -98,7 +98,7 @@ AllowedIPs = 0.0.0.0/0
 PersistentKeepalive = 25" > /etc/wireguard/wg0.conf
 
 ###############################################
-#                  END PASTE                  #
+#                     END                     #
 ###############################################
 ```
 
