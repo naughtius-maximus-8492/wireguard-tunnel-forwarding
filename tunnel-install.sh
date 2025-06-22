@@ -47,8 +47,7 @@ PersistentKeepalive = 25" > /etc/wireguard/$SERVER_WG_INTERFACE.conf
 
 
 # Build command to paste onto client
-echo "
-Wireguard server config built!
+echo "Wireguard server config built!
 
 ###############################################
 # PASTE THE COMMAND BELOW INTO YOUR PEER HOST #

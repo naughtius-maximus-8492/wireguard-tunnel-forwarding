@@ -6,6 +6,12 @@ These scripts allow you to quickly set up a full Wireguard tunnel between a peer
 
 These scripts should simplify the setup and management of this.
 
+## General Terminlogy
+### Peer Host
+This is likely where the services you want to expose are. For example, a game server would run on this host but wouldn't be exposed through its default network.
+### Server Host
+This is the machine you're hosting your wireguard server on and has access to the network use to expose your services. Generally, nothing runs on this host but the wireguard server. This is likely a publically accessible VPS in a datacenter.
+
 ## Requirements
 ### Server & Peer Hosts
 - wireguard
@@ -24,6 +30,9 @@ apt install wireguard iptables iptables-persistent
 ```
 
 **You should run these next commands as root on the peer and server host as this touches places where root can only access**
+
+## Downloading this repository
+Simply clone or download the zipped release into your **wireguard server host**. This does not need to be done for the peer.
 
 ## Setting up your environment file
 Both scripts source the `.env` file present in the repository. For most people, they will only need to get 
@@ -61,8 +70,43 @@ root@pelican-panel-proxy:~/wireguard-tunnel-forwarding-master# curl ifconfig.io
 From this example, we see the public IP of the server is `185.87.65.43`. Alternatively, if you've bought a VPS, this can easily be found on their control panels or set-up email.
 
 ## Running the Scripts
+### Tunnel Install
 Once these are all set, run `./tunnel-install.sh` on the **wireguard server host**. Provided `.env` is set up correctly, your configs are automatically populated on the server. You will also get a multiline command that should be pasted into the peer host to set up the necessary configs for connection to the wireguard server.
 
+
+If this runs succesfully, it should look similar to this:
+
+```
+root@wireguard-server-host:~/wireguard-tunnel-forwarding# ./tunnel-install.sh
+Setting iptables rules to enable internet access...
+Generating server and peer keys...
+Setting up wireguard config...
+Wireguard server config built!
+
+###############################################
+# PASTE THE COMMAND BELOW INTO YOUR PEER HOST #
+###############################################
+
+echo "[Interface]
+Address = 10.0.0.2/24
+PrivateKey = 6PioMcuAvo1J7grI53nTgieikJkfg3Uzz6HILLeq2Vo=
+
+[Peer]
+PublicKey = GDSWDQq8BYTCwM5DwtpRT66RIoKd6DCFqwevsJ6vQUY=
+Endpoint = 185.87.65.43:51820
+AllowedIPs = 0.0.0.0/0
+PersistentKeepalive = 25" > /etc/wireguard/wg0.conf
+
+###############################################
+#                  END PASTE                  #
+###############################################
+```
+
+Assuming both hosts use systemd and all necessary commands have been run, you can enable the service by running `systemctl enable --now wg-quick@wg0` on both hosts. Then, `systemctl status wg-quick@wg0` should show them both running without errors.
+
+On the peer, you should now be able to query the IP and get wireguard server hosts public IP. `example: curl ifconfig.io`
+
+### Port Management
 To open ports, run `./manage-port.sh -h` on the **wireguard server host** to see your options. As an example, this is what opening TCP & UDP port 42420 looks like:
 
 ```
