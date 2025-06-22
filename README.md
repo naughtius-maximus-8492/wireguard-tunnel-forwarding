@@ -15,6 +15,8 @@ This is the machine you're hosting your wireguard server on and has access to th
 ## Requirements
 ### Server & Peer Hosts
 - wireguard
+- Linux
+    - This was tested on Debian 12 but should work on any distro.
 ### Server Host Only
 - iptables
 - iptables-persistent
@@ -31,8 +33,8 @@ apt install wireguard iptables iptables-persistent
 
 **You should run these next commands as root on the peer and server host as this touches places where root can only access**
 
-## Downloading this repository
-Simply clone or download the zipped release into your **wireguard server host**. This does not need to be done for the peer.
+## Installation
+Simply clone the repository or download the latest release. If downloading the latest release, you'll need to unzip it before using it.
 
 ## Setting up your environment file
 Both scripts source the `.env` file present in the repository. For most people, they will only need to get 
