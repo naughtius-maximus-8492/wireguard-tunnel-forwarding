@@ -20,7 +20,7 @@ echo "Setting iptables rules to enable internet access..."
 #iptables-save > /etc/iptables/rules.v4
 
 # Enable ipv4 forwarding
-echo 1 > /proc/sys/net/ipv4/ip_forward
+echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
 sysctl -p
 
 # Generate server and peer keys
