@@ -14,10 +14,10 @@ fi
 echo "Setting iptables rules to enable internet access..."
 
 # Allow peer to access internet
-iptables -t nat -A POSTROUTING -o $PHYSICAL_INTERFACE -j MASQUERADE
+#iptables -t nat -A POSTROUTING -o $PHYSICAL_INTERFACE -j MASQUERADE
 
 # Save rules for reboot persistence
-iptables-save > /etc/iptables/rules.v4
+#iptables-save > /etc/iptables/rules.v4
 
 # Enable ipv4 forwarding
 echo 1 > /proc/sys/net/ipv4/ip_forward
@@ -39,6 +39,8 @@ echo "[Interface]
 Address = $SERVER_WG_SUBNET/24
 ListenPort = 51820
 PrivateKey = $SERVER_PRIVATE_KEY
+PostUp=iptables -A FORWARD -i $SERVER_WG_INTERFACE -j ACCEPT; iptables -t nat -A POSTROUTING -0 $PHYSICAL_INTERFACE -j MASQUERADE;
+PostDown=iptables -D FORWARD -i $SERVER_WG_INTERFACE -j ACCEPT; iptables -t nat -D POSTROUTING -0 $PHYSICAL_INTERFACE -j MASQUERADE;
 
 [Peer]
 PublicKey = $PEER_PUBLIC_KEY
