@@ -11,15 +11,9 @@ if [[ -z $SERVER_PUBLIC_IP ]] ; then
 	exit
 fi
 
-echo "Setting iptables rules to enable internet access..."
-
-# Allow peer to access internet
-#iptables -t nat -A POSTROUTING -o $PHYSICAL_INTERFACE -j MASQUERADE
-
-# Save rules for reboot persistence
-#iptables-save > /etc/iptables/rules.v4
-
 # Enable ipv4 forwarding
+echo "Enabling IPV4 forwarding..."
+
 echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
 sysctl -p
 
@@ -33,7 +27,7 @@ PEER_PRIVATE_KEY=$(wg genkey)
 PEER_PUBLIC_KEY=$(echo $PEER_PRIVATE_KEY | wg pubkey)
 
 # Create server config
-echo "Setting up wireguard config..."
+echo "Generating wireguard server config..."
 
 echo "[Interface]
 Address = $SERVER_WG_SUBNET/24
