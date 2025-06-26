@@ -13,6 +13,7 @@ This is likely where the services you want to expose are. For example, a game se
 This is the machine you're hosting your wireguard server on and has access to the network use to expose your services. Generally, nothing runs on this host but the wireguard server. This is likely a publically accessible VPS in a datacenter.
 
 ## Requirements
+Note that these scripts are designed for IPV4 only.
 ### Server & Peer Hosts
 - wireguard
 - Linux
@@ -60,10 +61,10 @@ root@wireguard-server-host:~# ip addr
 Here, my physical interface is actually `ens18` so you should change the `PHYSICAL_INTERFACE` variable in `.env` to `ens18`.
 
 ### SERVER_PUBLIC_IP
-The `.env` file has the `SERVER_PUBLIC_IP` set to nothing by default. This should just be the public IP of the server host. You can find this in many different ways, one way is to run the command `curl ifconfig.io`:
+The `.env` file has the `SERVER_PUBLIC_IP` set to nothing by default. This should just be the public IP of the server host. You can find this in many different ways, one way is to run the command `curl ifconfig.io -4`:
 
 ```
-root@pelican-panel-proxy:~/wireguard-tunnel-forwarding-master# curl ifconfig.io
+root@pelican-panel-proxy:~/wireguard-tunnel-forwarding-master# curl ifconfig.io -4
 185.87.65.43
 ```
 
@@ -104,7 +105,7 @@ PersistentKeepalive = 25" > /etc/wireguard/wg0.conf
 
 Assuming both hosts use systemd and all necessary commands have been run, you can enable the service by running `systemctl enable --now wg-quick@wg0` on both hosts. Then, `systemctl status wg-quick@wg0` should show them both running without errors.
 
-On the peer, you should now be able to query the IP and get wireguard server hosts public IP. `example: curl ifconfig.io`
+On the peer, you should now be able to query the IP and get wireguard server hosts public IP. `example: curl ifconfig.io -4`
 
 ### Port Management
 To open ports, run `./manage-port.sh -h` on the **wireguard server host** to see your options. As an example, this is what opening TCP & UDP port 42420 looks like:
