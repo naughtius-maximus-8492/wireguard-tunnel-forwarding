@@ -4,17 +4,17 @@ These scripts allow you to quickly set up a full Wireguard tunnel between a peer
 - You don't want to expose your services from your home's public IP but are happy to do it through a server on different IP (e.g. cheap VPS).
 - You want to use another server's DDOS protection without running your services on that specific machine.
 
-These scripts should simplify the setup and management of this.
+These scripts simplify the setup and management of this.
 
 ## General Terminlogy
 ### Peer Host
-This is likely where the services you want to expose are. For example, a game server would run on this host but wouldn't be exposed through its default network.
+This is the machine you want to host your servers on. For example, a game server would run on the peer host but have its network exposed on the server host.
 ### Server Host
-This is the machine you're hosting your wireguard server on and has access to the network use to expose your services. Generally, nothing runs on this host but the wireguard server. This is likely a publically accessible VPS in a datacenter.
+This is the machine you're hosting your wireguard server on and has access to the network used to expose your services. A publically accessible VPS in a datacenter is ideal.
 
 ## Requirements
-Note that these scripts are designed for IPV4 only.
 ### Server & Peer Hosts
+- IPV4 address
 - wireguard
 - Linux
     - This was tested on Debian 12 but should work on any distro.
@@ -23,7 +23,7 @@ Note that these scripts are designed for IPV4 only.
 - iptables-persistent
 - Port 51820 opened on your firewalls (both external and internal)
 
-If you're using apt, you can simply install using these commands:
+Aptitude package manager would be able to install these using:
 ```
 # Wireguard peer host
 apt install wireguard
@@ -33,10 +33,10 @@ apt install wireguard iptables iptables-persistent
 ```
 
 ## Installation
-Simply clone the repository or download the latest release. If downloading the latest release, you'll need to unzip it before using it.
+Clone the repository or download the latest release. If downloading the latest release, you'll need to unzip it before using it.
 
 ## Setting up your environment file
-Both scripts source the `.env` file present in the repository. For most people, they will only need to get 
+Both scripts source the `.env` file present in the repository. Most users will only need to modify `PHYSICAL_INTERFACE` and `SERVER_PUBLIC_IP`.
 
 ### PHYSICAL_INTERFACE
 The `.env` file has the `PHYSICAL_INTERFACE` set to nothing by default. You can find the correct value by running the command `ip addr`:
@@ -72,10 +72,10 @@ From this example, we see the public IP of the server is `185.87.65.43`. Alterna
 
 ## Running the Scripts
 ### Tunnel Install
-Once these are all set, run `./tunnel-install.sh` on the **wireguard server host**. Provided `.env` is set up correctly, your configs are automatically populated in `/etc/wireguard/wg0.conf`. You will also get a multiline command that should be pasted into the peer host to set up the necessary configs for connection to the wireguard server. Note that this is saved under `current-client-config.txt` and will be automatically updated each time you run `tunnel-install.sh`
+Run `./tunnel-install.sh` on the **wireguard server host**. Your configs are automatically populated in `/etc/wireguard/wg0.conf` using information from `.env`. You will also get a multiline command that should be pasted into the peer host to set up the necessary configs for connection to the wireguard server. This is also saved under `current-client-config.txt` and will be automatically updated each time you run `tunnel-install.sh`
 
 
-If this runs succesfully, it should look similar to this:
+A successful run should look like this:
 
 ```
 root@wireguard-server-host:~/wireguard-tunnel-forwarding# ./tunnel-install.sh
@@ -102,6 +102,8 @@ PersistentKeepalive = 25" > /etc/wireguard/wg0.conf
 #                     END                     #
 ###############################################
 ```
+> [!WARNING]
+> If you're using TMUX, do not copy this from the window as the formatting will be wrong. Either come out of TMUX and copy it or open the generate `current-client-config.txt` in a text reader such as `vim`, `nano`, `less` etc...
 
 Assuming both hosts use systemd and all necessary commands have been run, you can enable the service by running `systemctl enable --now wg-quick@wg0` on both hosts. Then, `systemctl status wg-quick@wg0` should show them both running without errors.
 
