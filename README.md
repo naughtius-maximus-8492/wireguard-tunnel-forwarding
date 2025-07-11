@@ -102,6 +102,8 @@ PersistentKeepalive = 25" > /etc/wireguard/wg0.conf
 #                     END                     #
 ###############################################
 ```
+> [!WARNING]
+> If you're using TMUX, do not copy this from the window as the formatting will be wrong. Either come out of TMUX and copy it or open the generate `current-client-config.txt` in a text reader such as `vim`, `nano`, `less` etc...
 
 Assuming both hosts use systemd and all necessary commands have been run, you can enable the service by running `systemctl enable --now wg-quick@wg0` on both hosts. Then, `systemctl status wg-quick@wg0` should show them both running without errors.
 
