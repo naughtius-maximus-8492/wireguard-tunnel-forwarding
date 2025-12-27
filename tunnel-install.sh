@@ -35,6 +35,7 @@ ListenPort = 51820
 PrivateKey = $SERVER_PRIVATE_KEY
 PostUp=iptables -A FORWARD -i $SERVER_WG_INTERFACE -j ACCEPT; iptables -t nat -A POSTROUTING -o $PHYSICAL_INTERFACE -j MASQUERADE;
 PostDown=iptables -D FORWARD -i $SERVER_WG_INTERFACE -j ACCEPT; iptables -t nat -D POSTROUTING -o $PHYSICAL_INTERFACE -j MASQUERADE;
+MTU=$MTU
 
 [Peer]
 PublicKey = $PEER_PUBLIC_KEY
@@ -53,6 +54,7 @@ function echo_client_config {
 echo \"[Interface]
 Address = $PEER_WG_SUBNET/24
 PrivateKey = $PEER_PRIVATE_KEY
+MTU=$MTU
 
 [Peer]
 PublicKey = $SERVER_PUBLIC_KEY
