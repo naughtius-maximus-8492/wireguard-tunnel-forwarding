@@ -14,8 +14,8 @@ fi
 # Enable ipv4 forwarding
 echo "Enabling IPV4 forwarding..."
 
-echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
-sysctl -p
+echo "net.ipv4.ip_forward=1" >> /etc/sysctl.d/99-wireguard-tunnel-install.conf
+sysctl --system
 
 # Generate server and peer keys
 echo "Generating server and peer keys..."
