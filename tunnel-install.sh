@@ -14,7 +14,7 @@ fi
 # Enable ipv4 forwarding
 echo "Enabling IPV4 forwarding..."
 
-echo "net.ipv4.ip_forward=1" >> /etc/sysctl.d/99-wireguard-tunnel-install.conf
+echo "net.ipv4.ip_forward=1" > /etc/sysctl.d/99-wireguard-tunnel-install.conf
 sysctl --system
 
 # Generate server and peer keys
@@ -33,8 +33,13 @@ echo "[Interface]
 Address = $SERVER_WG_SUBNET/24
 ListenPort = 51820
 PrivateKey = $SERVER_PRIVATE_KEY
-PostUp=iptables -A FORWARD -i $SERVER_WG_INTERFACE -j ACCEPT; iptables -t nat -A POSTROUTING -o $PHYSICAL_INTERFACE -j MASQUERADE;
-PostDown=iptables -D FORWARD -i $SERVER_WG_INTERFACE -j ACCEPT; iptables -t nat -D POSTROUTING -o $PHYSICAL_INTERFACE -j MASQUERADE;
+
+PostUp=iptables -t nat -A POSTROUTING -o $PHYSICAL_INTERFACE -j MASQUERADE
+PostUp=iptables -A FORWARD -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+
+PostDown=iptables -t nat -D POSTROUTING -o $PHYSICAL_INTERFACE -j MASQUERADE
+PostDown=iptables -D FORWARD -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+
 MTU=$MTU
 
 [Peer]
