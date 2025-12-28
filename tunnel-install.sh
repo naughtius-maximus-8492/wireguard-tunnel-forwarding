@@ -24,21 +24,21 @@ PEER_PUBLIC_KEY=$(echo $PEER_PRIVATE_KEY | wg pubkey)
 echo "Generating wireguard server config..."
 
 echo "[Interface]
-Address = $SERVER_WG_SUBNET/24
+Address = $WG_SERVER_ADDRESS/24
 ListenPort = 51820
 PrivateKey = $SERVER_PRIVATE_KEY
 
-PostUp=iptables -t nat -A POSTROUTING -o $PHYSICAL_INTERFACE -j MASQUERADE
-PostUp=iptables -A FORWARD -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+PostUp = iptables -t nat -A POSTROUTING -o $PHYSICAL_INTERFACE -j MASQUERADE
+PostUp = iptables -A FORWARD -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 
-PostDown=iptables -t nat -D POSTROUTING -o $PHYSICAL_INTERFACE -j MASQUERADE
-PostDown=iptables -D FORWARD -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+PostDown = iptables -t nat -D POSTROUTING -o $PHYSICAL_INTERFACE -j MASQUERADE
+PostDown = iptables -D FORWARD -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 
-MTU=$MTU
+MTU = $MTU
 
 [Peer]
 PublicKey = $PEER_PUBLIC_KEY
-AllowedIPs = $PEER_WG_SUBNET/32
+AllowedIPs = $WG_PEER_ADDRESS/32
 PersistentKeepalive = 25" > /etc/wireguard/$SERVER_WG_INTERFACE.conf
 
 echo "Wireguard server config built!"

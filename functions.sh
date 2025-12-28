@@ -1,3 +1,5 @@
+#!/bin/bash
+
 validate_env() 
 {
 	if [[ -z $PHYSICAL_INTERFACE ]] ; then
@@ -41,7 +43,7 @@ echo_client_config()
 ###############################################
 
 echo \"[Interface]
-Address = $PEER_WG_SUBNET/24
+Address = $WG_PEER_ADDRESS/24
 PrivateKey = $PEER_PRIVATE_KEY
 MTU=$MTU
 
@@ -55,3 +57,4 @@ PersistentKeepalive = 25\" > /etc/wireguard/$PEER_WG_INTERFACE.conf
 #                     END                     #
 ###############################################"
 }
+
