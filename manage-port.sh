@@ -48,12 +48,12 @@ done
 
 # Exit if port not in usable range
 if (( !($port >= 1 && $port <= 65535) )) ; then
-	echo "Port not in valid range (1 - 65535). Use -h for help."
+	echo "ERROR: Invalid argument for -p [1 - 65535]. Use -h for help."
 	exit
 fi
 
 if  [[ $protocol != "udp" && $protocol != "tcp" ]] ; then 
-	echo "ERROR: Protocol must be set to a valid value [ tcp | udp ]. Use -h for help."
+	echo "ERROR: Invalid argument for -t [ tcp | udp ]. Use -h for help."
 	exit
 fi
 
@@ -64,17 +64,17 @@ elif [[ $rule == "open" ]] ; then
 	echo "ACTION: $rule $protocol $port"
 	rule="A"
 else
-	echo "ERROR: You haven't specified whether to open or close port $port. Use -h for help."
+	echo "ERROR: Invalid arg for -s [ open | close ]. Use -h for help."
 	exit
 fi
 
 # Print commands	
 set -o xtrace 
 
-# Route packets client -> server
+# Route inbound connections to wireguard interface
 iptables -$rule FORWARD -i $PHYSICAL_INTERFACE -o $SERVER_WG_INTERFACE -p $protocol --dport $port -m conntrack --ctstate NEW -j ACCEPT
 
-# Route packets server -> client
+# Set dnat for inbound connections
 iptables -t nat -$rule PREROUTING -i $PHYSICAL_INTERFACE -p $protocol --dport $port -m conntrack --ctstate NEW -j DNAT --to-destination $PEER_WG_SUBNET
 
 
