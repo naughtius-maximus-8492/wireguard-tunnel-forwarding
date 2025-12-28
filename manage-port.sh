@@ -17,7 +17,7 @@ function print_help {
 
 function show_ports {
 	echo "Open ports:"
-	iptables -S | grep dport | awk '{print $12,$14}'
+	iptables -S | grep dport | awk '{print $10,$12}'
 	exit
 }
 
@@ -64,7 +64,7 @@ set -o xtrace
 iptables -$rule FORWARD -i $PHYSICAL_INTERFACE -o $SERVER_WG_INTERFACE -p $protocol --dport $port -m conntrack --ctstate NEW -j ACCEPT
 
 # Route packets server -> client
-iptables -t nat -$rule PREROUTING -i $PHYSICAL_INTERFACE -p $protocol --dport $port -j DNAT --to-destination $PEER_WG_SUBNET
+iptables -t nat -$rule PREROUTING -i $PHYSICAL_INTERFACE -p $protocol --dport $port -m conntrack --ctstate NEW -j DNAT --to-destination $PEER_WG_SUBNET
 
 
 # Stop printing commands	
