@@ -1,24 +1,9 @@
+#!/bin/bash
+
 source .env
+source functions.sh
 
-function print_help {
-	echo "Help Menu:"
-	echo "-h            ; Show this menu"
-	echo ""
-	echo "-- Port management --"
-	echo "-p <port>     ; Port to manage"
-	echo "-t <protocol> ; Set to use [ tcp | udp]"
-	echo "-s <state>    ; Set to [ open | close ] port"
-	echo ""
-	echo "-- iptables management --"
-	echo "-l            ; List open ports"
-	exit
-} 	
-
-function show_ports {
-	echo "Open ports:"
-	iptables -S | grep dport | awk '{print $10,$12}'
-	exit
-}
+validate_env
 
 # Default to showing help when no args present
 if [ "$#" -lt 1 ]; then
