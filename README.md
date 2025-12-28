@@ -90,11 +90,11 @@ Wireguard server config built!
 
 echo "[Interface]
 Address = 10.0.0.2/24
-PrivateKey = U4GBSzYDu74R/Uraxfj47XbLyKD1CI78Y7iDTri3NFg=
+PrivateKey = 6PioMcuAvo1J7grI53nTgieikJkfg3Uzz6HILLeq2Vo=
 
 [Peer]
-PublicKey = yJxpp15fzhfG0L3+WfZ26hj7TZZZ/BmM6oRxQG9ZoWY=
-Endpoint = 123.45.67.89:51820
+PublicKey = GDSWDQq8BYTCwM5DwtpRT66RIoKd6DCFqwevsJ6vQUY=
+Endpoint = 185.87.65.43:51820
 AllowedIPs = 0.0.0.0/0
 PersistentKeepalive = 25" > /etc/wireguard/wg0.conf
 
