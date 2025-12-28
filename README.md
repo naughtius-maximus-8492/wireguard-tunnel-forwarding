@@ -80,34 +80,6 @@ A successful run should look like this:
 ```
 root@wireguard-server-host:~/wireguard-tunnel-forwarding# ./tunnel-install.sh
 Enabling IPV4 forwarding...
-* Applying /usr/lib/sysctl.d/10-coredump-debian.conf ...
-* Applying /usr/lib/sysctl.d/50-default.conf ...
-* Applying /usr/lib/sysctl.d/50-pid-max.conf ...
-* Applying /etc/sysctl.d/99-wireguard-tunnel-install.conf ...
-kernel.core_pattern = core
-kernel.sysrq = 0x01b6
-kernel.core_uses_pid = 1
-net.ipv4.conf.default.rp_filter = 2
-net.ipv4.conf.eth0.rp_filter = 2
-net.ipv4.conf.lo.rp_filter = 2
-net.ipv4.conf.wg0.rp_filter = 2
-net.ipv4.conf.default.accept_source_route = 0
-net.ipv4.conf.eth0.accept_source_route = 0
-net.ipv4.conf.lo.accept_source_route = 0
-net.ipv4.conf.wg0.accept_source_route = 0
-net.ipv4.conf.default.promote_secondaries = 1
-net.ipv4.conf.eth0.promote_secondaries = 1
-net.ipv4.conf.lo.promote_secondaries = 1
-net.ipv4.conf.wg0.promote_secondaries = 1
-net.ipv4.ping_group_range = 0 2147483647
-net.core.default_qdisc = fq_codel
-fs.protected_hardlinks = 1
-fs.protected_symlinks = 1
-fs.protected_regular = 2
-fs.protected_fifos = 1
-vm.max_map_count = 1048576
-kernel.pid_max = 4194304
-net.ipv4.ip_forward = 1
 Generating server and peer keys...
 Generating wireguard server config...
 Wireguard server config built!
@@ -118,12 +90,11 @@ Wireguard server config built!
 
 echo "[Interface]
 Address = 10.0.0.2/24
-PrivateKey = wMrQD4oi8i1Sewgov1qaccfs7WqCgac5wGAM2vQcTlQ=
-MTU=1400
+PrivateKey = 6PioMcuAvo1J7grI53nTgieikJkfg3Uzz6HILLeq2Vo=
 
 [Peer]
-PublicKey = +YR/3UQHdzCQmbOjCguw0XOlGU0oqWJID8z9dGIN9G8=
-Endpoint = 38.109.11.68:51820
+PublicKey = GDSWDQq8BYTCwM5DwtpRT66RIoKd6DCFqwevsJ6vQUY=
+Endpoint = 185.87.65.43:51820
 AllowedIPs = 0.0.0.0/0
 PersistentKeepalive = 25" > /etc/wireguard/wg0.conf
 
@@ -142,14 +113,14 @@ On the peer, you should now be able to query the IP and get wireguard server hos
 To open ports, run `./manage-port.sh -h` on the **wireguard server host** to see your options. As an example, this is what opening TCP & UDP port 42420 looks like:
 
 ```
-root@wireguard-server-host:~/wireguard-tunnel-forwarding# ./manage-port.sh -t tcp -s open -p 42420
-ACTION: open tcp 42420
-++ iptables -A FORWARD -i eth0 -o wg0 -p tcp --dport 42420 -m conntrack --ctstate NEW -j ACCEPT
-++ iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 42420 -m conntrack --ctstate NEW -j DNAT --to-destination 10.0.0.2
+root@wireguard-server-host:~/wireguard-tunnel-forwarding-master# ./manage-port.sh -p 42420
+++ iptables -t nat -A PREROUTING -i ens18 -p tcp --dport 42420 -j DNAT --to-destination 10.0.0.2:42420
+++ iptables -A FORWARD -i wg0 -o ens18 -p tcp --sport 42420 -s 10.0.0.2 -j ACCEPT
+++ iptables -A FORWARD -i ens18 -o wg0 -p tcp --dport 42420 -d 10.0.0.2 -j ACCEPT
 ++ set +o xtrace
-root@wireguard-server-host:~/wireguard-tunnel-forwarding# ./manage-port.sh -t udp -s open -p 42420
-ACTION: open udp 42420
-++ iptables -A FORWARD -i eth0 -o wg0 -p udp --dport 42420 -m conntrack --ctstate NEW -j ACCEPT
-++ iptables -t nat -A PREROUTING -i eth0 -p udp --dport 42420 -m conntrack --ctstate NEW -j DNAT --to-destination 10.0.0.2
+root@wireguard-server-host:~/wireguard-tunnel-forwarding-master# ./manage-port.sh -up 42420
+++ iptables -t nat -A PREROUTING -i ens18 -p udp --dport 42420 -j DNAT --to-destination 10.0.0.2:42420
+++ iptables -A FORWARD -i wg0 -o ens18 -p udp --sport 42420 -s 10.0.0.2 -j ACCEPT
+++ iptables -A FORWARD -i ens18 -o wg0 -p udp --dport 42420 -d 10.0.0.2 -j ACCEPT
 ++ set +o xtrace
 ```
