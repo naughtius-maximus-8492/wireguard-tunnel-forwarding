@@ -60,7 +60,7 @@ set -o xtrace
 iptables -$rule FORWARD -i $PHYSICAL_INTERFACE -o $SERVER_WG_INTERFACE -p $protocol --dport $port -m conntrack --ctstate NEW -j ACCEPT
 
 # Set dnat for inbound connections
-iptables -t nat -$rule PREROUTING -i $PHYSICAL_INTERFACE -p $protocol --dport $port -m conntrack --ctstate NEW -j DNAT --to-destination $WG_PEER_ADDRESS
+iptables -t nat -$rule PREROUTING -i $PHYSICAL_INTERFACE -p $protocol --dport $port -m conntrack --ctstate NEW -j DNAT --to-destination $PEER_WG_SUBNET
 
 
 # Stop printing commands	
