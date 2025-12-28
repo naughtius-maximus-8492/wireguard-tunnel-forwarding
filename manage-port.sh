@@ -2,16 +2,15 @@ source .env
 
 function print_help {
 	echo "Help Menu:"
-	echo "-h        ; Show this menu"
+	echo "-h            ; Show this menu"
 	echo ""
 	echo "-- Port management --"
-	echo "-p <port> ; Set port to open/close"
-	echo "-c        ; Close the port rather than open it"
-	echo "-u        ; Open a UDP port instead of TCP"
+	echo "-p <port>     ; Port to manage"
+	echo "-t <protocol> ; Set to use [ tcp | udp]"
+	echo "-s <state>    ; Set to [ open | close ] port"
 	echo ""
 	echo "-- iptables management --"
-	echo "-t        ; Makes the iptables rule temporary. Reboots will flush it"
-	echo "-s        ; Show open ports"
+	echo "-l            ; List open ports"
 	exit
 } 	
 
@@ -28,32 +27,44 @@ fi
 
 # A : Adds rule
 # D : Deletes rule
-rule=A
+rule=
 
 port=-1
-protocol=tcp
+protocol=
 
-# When true, runs iptables-save at the end to persist on reboot
-save=true
-
-while getopts hsp:ctu flag
+while getopts hlp:t:s: flag
 do
     case "${flag}" in
 	h) print_help;;
-	s) show_ports;;
-        p) port=${OPTARG};;
-	c) rule=D;;
-	t) save=false;;
-	u) protocol=udp;;
+	l) show_ports;;
+	p) port=${OPTARG};;
+	t) protocol=${OPTARG,,};;
+	s) rule=${OPTARG,,};;
 	*) exit;;
     esac
 done
 
+## Validate args 
+
 # Exit if port not in usable range
 if (( !($port >= 1 && $port <= 65535) )) ; then
-	echo "Port not in valid range (1 - 65535)"
-	echo "> port = $port"
-	echo "Use -h for help"
+	echo "Port not in valid range (1 - 65535). Use -h for help."
+	exit
+fi
+
+if  [[ $protocol != "udp" && $protocol != "tcp" ]] ; then 
+	echo "ERROR: Protocol must be set to a valid value [ tcp | udp ]. Use -h for help."
+	exit
+fi
+
+if [[ $rule == "close" ]] ; then
+	echo "ACTION: $rule $protocol $port"
+	rule="D"
+elif [[ $rule == "open" ]] ; then
+	echo "ACTION: $rule $protocol $port"
+	rule="A"
+else
+	echo "ERROR: You haven't specified whether to open or close port $port. Use -h for help."
 	exit
 fi
 
@@ -70,6 +81,5 @@ iptables -t nat -$rule PREROUTING -i $PHYSICAL_INTERFACE -p $protocol --dport $p
 # Stop printing commands	
 set +o xtrace
 
-if [ $save == true ] ; then
-	iptables-save > /etc/iptables/rules.v4
-fi
+iptables-save > /etc/iptables/rules.v4
+
