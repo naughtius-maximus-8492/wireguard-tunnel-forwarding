@@ -1,25 +1,9 @@
+#!/bin/bash
+
 source .env
+source functions.sh
 
-function print_help {
-	echo "Help Menu:"
-	echo "-h        ; Show this menu"
-	echo ""
-	echo "-- Port management --"
-	echo "-p <port> ; Set port to open/close"
-	echo "-c        ; Close the port rather than open it"
-	echo "-u        ; Open a UDP port instead of TCP"
-	echo ""
-	echo "-- iptables management --"
-	echo "-t        ; Makes the iptables rule temporary. Reboots will flush it"
-	echo "-s        ; Show open ports"
-	exit
-} 	
-
-function show_ports {
-	echo "Open ports:"
-	iptables -S | grep dport | awk '{print $12,$14}'
-	exit
-}
+validate_env
 
 # Default to showing help when no args present
 if [ "$#" -lt 1 ]; then
@@ -28,50 +12,59 @@ fi
 
 # A : Adds rule
 # D : Deletes rule
-rule=A
+rule=
 
 port=-1
-protocol=tcp
+protocol=
 
-# When true, runs iptables-save at the end to persist on reboot
-save=true
-
-while getopts hsp:ctu flag
+while getopts hlp:t:s: flag
 do
     case "${flag}" in
 	h) print_help;;
-	s) show_ports;;
-        p) port=${OPTARG};;
-	c) rule=D;;
-	t) save=false;;
-	u) protocol=udp;;
+	l) show_ports;;
+	p) port=${OPTARG};;
+	t) protocol=${OPTARG,,};;
+	s) rule=${OPTARG,,};;
 	*) exit;;
     esac
 done
 
+## Validate args 
+
 # Exit if port not in usable range
 if (( !($port >= 1 && $port <= 65535) )) ; then
-	echo "Port not in valid range (1 - 65535)"
-	echo "> port = $port"
-	echo "Use -h for help"
+	echo "ERROR: Invalid argument for -p [1 - 65535]. Use -h for help."
+	exit
+fi
+
+if  [[ $protocol != "udp" && $protocol != "tcp" ]] ; then 
+	echo "ERROR: Invalid argument for -t [ tcp | udp ]. Use -h for help."
+	exit
+fi
+
+if [[ $rule == "close" ]] ; then
+	echo "ACTION: $rule $protocol $port"
+	rule="D"
+elif [[ $rule == "open" ]] ; then
+	echo "ACTION: $rule $protocol $port"
+	rule="A"
+else
+	echo "ERROR: Invalid arg for -s [ open | close ]. Use -h for help."
 	exit
 fi
 
 # Print commands	
 set -o xtrace 
 
-# iptables PREROUTING rule
-iptables -t nat -$rule PREROUTING -i $PHYSICAL_INTERFACE -p $protocol --dport $port -j DNAT --to-destination $PEER_WG_SUBNET:$port
+# Route inbound connections to wireguard interface
+iptables -$rule FORWARD -i $PHYSICAL_INTERFACE -o $SERVER_WG_INTERFACE -p $protocol --dport $port -m conntrack --ctstate NEW -j ACCEPT
 
-# Route packets client -> server
-iptables -$rule FORWARD -i $SERVER_WG_INTERFACE -o $PHYSICAL_INTERFACE -p $protocol --sport $port -s $PEER_WG_SUBNET -j ACCEPT
+# Set dnat for inbound connections
+iptables -t nat -$rule PREROUTING -i $PHYSICAL_INTERFACE -p $protocol --dport $port -m conntrack --ctstate NEW -j DNAT --to-destination $PEER_WG_SUBNET
 
-# Route packets server -> client
-iptables -$rule FORWARD -i $PHYSICAL_INTERFACE -o $SERVER_WG_INTERFACE -p $protocol --dport $port -d $PEER_WG_SUBNET -j ACCEPT
 
 # Stop printing commands	
 set +o xtrace
 
-if [ $save == true ] ; then
-	iptables-save > /etc/iptables/rules.v4
-fi
+iptables-save > /etc/iptables/rules.v4
+
